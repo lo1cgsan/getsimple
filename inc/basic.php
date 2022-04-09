@@ -61,6 +61,7 @@ function clean_img_name($text)  {
  * @return string
  */
 function to7bit($text,$from_enc="UTF-8") {
+	if (is_null($text)) $text = "";
 	if (function_exists('mb_convert_encoding')) {
    		$text = mb_convert_encoding($text,'HTML-ENTITIES',$from_enc);
     } else {
