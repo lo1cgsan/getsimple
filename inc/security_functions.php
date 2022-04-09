@@ -32,7 +32,7 @@ $file_ext_blacklist = array(
 	# Other types that may be interpreted by some servers
 	'shtml', 'jhtml', 'pl', 'py', 'cgi', 'sh', 'ksh', 'bsh', 'c', 'htaccess', 'htpasswd',
 	# May contain harmful executables for Windows victims
-	'exe', 'scr', 'dll', 'msi', 'vbs', 'bat', 'com', 'pif', 'cmd', 'vxd', 'cpl' 
+	'exe', 'scr', 'dll', 'msi', 'vbs', 'bat', 'com', 'pif', 'cmd', 'vxd', 'cpl'
 );
 
 
@@ -77,23 +77,23 @@ function xss_clean($data){
 	$data = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $data);
 	$data = preg_replace('/(&#x*[0-9A-F]+);*/iu', '$1;', $data);
 	$data = html_entity_decode($data, ENT_COMPAT, 'UTF-8');
-	
+
 	// Remove any attribute starting with "on" or xmlns
 	$data = preg_replace('#(<[^>]+?[\x00-\x20"\'/])(?:on|xmlns)[^>]*+>#iu', '$1>', $data);
-	
+
 	// Remove javascript: and vbscript: protocols
 	$data = preg_replace('#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $data);
 	$data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $data);
 	$data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $data);
-	
+
 	// Only works in IE: <span style="width: expression(alert('Ping!'));"></span>
 	$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
 	$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
 	$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu', '$1>', $data);
-	
+
 	// Remove namespaced elements (we do not need them)
 	$data = preg_replace('#</*\w+:\w[^>]*+>#i', '', $data);
-	
+
 	do
 	{
 		// Remove really unwanted tags
@@ -101,7 +101,7 @@ function xss_clean($data){
 		$data = preg_replace('#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i', '', $data);
 	}
 	while ($old_data !== $data);
-	
+
 	// we are done...
 	// if($datadirty !== $data) debugLog("string cleaned: removed ". (strlen($datadirty) - strlen($data)) .' chars');
 	return $data;
@@ -117,25 +117,25 @@ function xss_clean($data){
  *
  * @param string $action Id of current page
  * @param string $file Optional, default is empty string
- * @param bool $last 
+ * @param bool $last
  * @return string
  */
 function get_nonce($action, $file = "", $last = false) {
 	global $USR;
 	global $SALT;
-	
+
 	if($file == "")
 		$file = $_SERVER['PHP_SELF'];
-	
+
 	// using user agent since ip can change on proxys
 	$uid = $_SERVER['HTTP_USER_AGENT'];
-	
+
 	// Limits Nonce to one hour
-	$time = $last ? time() - 3600: time(); 
-	
+	$time = $last ? time() - 3600: time();
+
 	// Mix with a little salt
 	$hash=sha1($action.$file.$uid.$USR.$SALT.@date('YmdH',$time));
-	
+
 	return $hash;
 }
 
@@ -151,7 +151,7 @@ function get_nonce($action, $file = "", $last = false) {
  * @param string $action
  * @param string $file Optional, default is empty string
  * @return bool
- */	
+ */
 function check_nonce($nonce, $action, $file = ""){
 	return ( $nonce === get_nonce($action, $file) || $nonce === get_nonce($action, $file, true) );
 }
@@ -168,7 +168,7 @@ function check_nonce($nonce, $action, $file = ""){
  * @param string $name, filename
  * @param string $mime, optional
  * @return bool
- */	
+ */
 function validate_safe_file($file, $name, $mime = null){
 	global $mime_type_blacklist, $file_ext_blacklist, $mime_type_whitelist, $file_ext_whitelist;
 
@@ -188,11 +188,11 @@ function validate_safe_file($file, $name, $mime = null){
 	if($mime_type_whitelist || $file_ext_whitelist) return false;
 
 	if ($mime && in_arrayi($mime, $mime_type_blacklist)) {
-		return false;	
+		return false;
 	} elseif (in_arrayi($file_extension, $file_ext_blacklist)) {
-		return false;	
+		return false;
 	} else {
-		return true;	
+		return true;
 	}
 }
 
@@ -233,7 +233,7 @@ function path_is_safe($path,$pathmatch,$subdir = true){
 
 /**
  * Check if server is Apache
- * 
+ *
  * @returns bool
  */
 function server_is_apache() {
@@ -259,7 +259,7 @@ function var_out($var,$filter = "special"){
 
 	if(function_exists( "filter_var") ){
 		$aryFilter = array(
-			"string"  => FILTER_SANITIZE_STRING,
+			"string"  => FILTER_UNSAFE_RAW,
 			"int"     => FILTER_SANITIZE_NUMBER_INT,
 			"float"   => FILTER_SANITIZE_NUMBER_FLOAT,
 			"url"     => FILTER_SANITIZE_URL,
