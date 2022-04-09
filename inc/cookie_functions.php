@@ -17,10 +17,12 @@ require_once(GSADMININCPATH.'configuration.php');
  */
 function gs_setcookie($id,$value){
 	GLOBAL $cookie_time, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly;
-	
+
 	$expire = time() + $cookie_time;
 	// debugLog('set cookie: '.implode(',',array($id, $value, $cookie_time, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly)));
-  	return setcookie($id, $value, $expire, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly); 
+	if (is_null($cookie_domain)) $cookie_domain = "";
+	if (is_null($cookie_secure)) $cookie_secure = false;
+  	return setcookie($id, $value, $expire, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
 }
 
 /**
@@ -49,7 +51,7 @@ function create_cookie() {
   $saltUSR    = sha1($USR.$SALT);
   $saltCOOKIE = sha1($cookie_name.$SALT);
 
-  gs_setcookie('GS_ADMIN_USERNAME', $USR);   
+  gs_setcookie('GS_ADMIN_USERNAME', $USR);
   gs_setcookie($saltCOOKIE, $saltUSR);
 }
 
@@ -64,7 +66,7 @@ function create_cookie() {
 function kill_cookie($identifier) {
   global $SALT,$cookie_time;
   $saltCOOKIE = sha1($identifier.$SALT);
- 	gs_unsetcookie('GS_ADMIN_USERNAME');  
+ 	gs_unsetcookie('GS_ADMIN_USERNAME');
   if (isset($_COOKIE[$saltCOOKIE])) {
 		$_COOKIE[$saltCOOKIE] = FALSE;
 		gs_unsetcookie($saltCOOKIE);
@@ -88,8 +90,8 @@ function cookie_check() {
 	$saltCOOKIE = sha1($cookie_name.$SALT);
 	if(isset($_COOKIE[$saltCOOKIE])&&$_COOKIE[$saltCOOKIE]==sha1($saltUSR)) {
 		return TRUE; // Cookie proves logged in status.
-	} else { 
-		return FALSE; 
+	} else {
+		return FALSE;
 	}
 }
 
@@ -122,9 +124,9 @@ function login_cookie_check() {
  * @return bool
  */
 function get_cookie($cookie_name) {
-	if(cookie_check($cookie_name)==TRUE) { 
+	if(cookie_check($cookie_name)==TRUE) {
 		return $_COOKIE[$cookie_name];
 	}
 }
-	
+
 ?>
