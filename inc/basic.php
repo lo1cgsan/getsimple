@@ -687,12 +687,12 @@ function i18n_merge_impl($plugin, $lang, &$globali18n) {
  * @return string
  */
 function safe_slash_html($text) {
-	if (get_magic_quotes_gpc()==0) {
-		$text = addslashes(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
-	} else {
-		$text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-	}
-
+	// if (get_magic_quotes_gpc()==0) {
+	// 	$text = addslashes(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
+	// } else {
+	// 	$text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+	// }
+	$text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 	return xmlFilterChars($text);
 }
 

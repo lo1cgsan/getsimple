@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Edit Theme
  *
@@ -14,9 +14,9 @@ include('inc/common.php');
 
 # variable settings
 login_cookie_check();
-$theme_options 		= ''; 
-$template_file 		= ''; 
-$template 			= $TEMPLATE; 
+$theme_options 		= '';
+$template_file 		= '';
+$template 			= $TEMPLATE;
 $theme_templates 	= '';
 
 # were changes submitted?
@@ -43,7 +43,7 @@ if(!filepath_is_safe($themepath.$template_file,GSTHEMESPATH,true)) die();
 
 # check for form submission
 if((isset($_POST['submitsave']))){
-	
+
 	# check for csrf
 	if (!defined('GSNOCSRF') || (GSNOCSRF == FALSE) ) {
 		$nonce = $_POST['nonce'];
@@ -51,10 +51,10 @@ if((isset($_POST['submitsave']))){
 			die("CSRF detected!");
 		}
 	}
-	
+
 	# save edited template file
 	$SavedFile = $_POST['edited_file'];
-	$FileContents = get_magic_quotes_gpc() ? stripslashes($_POST['content']) : $_POST['content'];	
+	$FileContents = $_POST['content'];
 	$fh = fopen(GSTHEMESPATH . $SavedFile, 'w') or die("can't open file");
 	fwrite($fh, $FileContents);
 	fclose($fh);
@@ -64,18 +64,18 @@ if((isset($_POST['submitsave']))){
 # create themes dropdown
 $themes_path = GSTHEMESPATH;
 $themes_handle = opendir($themes_path);
-$theme_options .= '<select class="text" style="width:225px;" name="t" id="theme-folder" >';	
+$theme_options .= '<select class="text" style="width:225px;" name="t" id="theme-folder" >';
 while ($file = readdir($themes_handle)) {
 	$curpath = $themes_path .'/'. $file;
 	if( is_dir($curpath) && $file != "." && $file != ".." ) {
 		$theme_dir_array[] = $file;
 		$sel="";
-		
+
 		if (file_exists($curpath.'/template.php')){
-			if ($template == $file){ 
-				$sel="selected"; 
+			if ($template == $file){
+				$sel="selected";
 			}
-			
+
 			$theme_options .= '<option '.$sel.' value="'.$file.'" >'.$file.'</option>';
 		}
 	}
@@ -92,16 +92,16 @@ foreach ($templates as $file){
   $extension=pathinfo($file,PATHINFO_EXTENSION);
   if (in_array($extension, $allowed_extensions)){
   $filename=pathinfo($file,PATHINFO_BASENAME);
-  $filenamefull=substr(strstr($file,'/theme/'.$template.'/'),strlen('/theme/'.$template.'/'));   
-  if ($template_file == $filenamefull){ 
-          $sel="selected"; 
-  } else { 
+  $filenamefull=substr(strstr($file,'/theme/'.$template.'/'),strlen('/theme/'.$template.'/'));
+  if ($template_file == $filenamefull){
+          $sel="selected";
+  } else {
           $sel="";
   }
-  if ($filename == 'template.php'){ 
-          $templatename=i18n_r('DEFAULT_TEMPLATE'); 
-  } else { 
-          $templatename=$filenamefull; 
+  if ($filename == 'template.php'){
+          $templatename=i18n_r('DEFAULT_TEMPLATE');
+  } else {
+          $templatename=$filenamefull;
   }
   $theme_templates .= '<option '.$sel.' value="'.$templatename.'" >'.$templatename.'</option>';
   }
@@ -110,18 +110,18 @@ $theme_templates .= "</select></span>";
 
 if (!getDef('GSNOHIGHLIGHT',true)){
 	register_script('codemirror', $SITEURL.$GSADMIN.'/template/js/codemirror/lib/codemirror-compressed.js', '0.2.0', FALSE);
-	
+
 	register_style('codemirror-css',$SITEURL.$GSADMIN.'/template/js/codemirror/lib/codemirror.css','screen',FALSE);
 	register_style('codemirror-theme',$SITEURL.$GSADMIN.'/template/js/codemirror/theme/default.css','screen',FALSE);
-	
+
 	queue_script('codemirror', GSBACK);
-	
+
 	queue_style('codemirror-css', GSBACK);
 	queue_style('codemirror-theme', GSBACK);
 
 }
 
-get_template('header', cl($SITENAME).' &raquo; '.i18n_r('THEME_MANAGEMENT')); 
+get_template('header', cl($SITENAME).' &raquo; '.i18n_r('THEME_MANAGEMENT'));
 ?>
 
 <?php include('template/include-nav.php');
@@ -191,25 +191,25 @@ window.onload = function() {
 		}
       	});
      var hlLine = editor.setLineClass(0, "activeline");
-    
+
      }
-     
+
 </script>
-<?php 
+<?php
 }
 ?>
 <div class="bodycontent clearfix">
-	
+
 	<div id="maincontent">
 		<div class="main">
 		<h3><?php i18n('EDIT_THEME'); ?></h3>
 		<form action="<?php myself(); ?>" method="get" accept-charset="utf-8" >
 		<p><?php echo $theme_options; ?><?php echo $theme_templates; ?>&nbsp;&nbsp;&nbsp;<input class="submit" type="submit" name="s" value="<?php i18n('EDIT'); ?>" /></p>
 		</form>
-		
+
 		<p><b><?php i18n('EDITING_FILE'); ?>:</b> <code><?php echo $SITEURL.'theme/'. tsl($template) .'<b>'. $template_file; ?></b></code></p>
 		<?php $content = file_get_contents(GSTHEMESPATH . tsl($template) . $template_file); ?>
-		
+
 		<form action="<?php myself(); ?>?t=<?php echo $template; ?>&amp;f=<?php echo $template_file; ?>" method="post" >
 			<input id="nonce" name="nonce" type="hidden" value="<?php echo get_nonce("save"); ?>" />
 			<textarea name="content" id="codetext" wrap='off' ><?php echo htmlentities($content, ENT_QUOTES, 'UTF-8'); ?></textarea>
@@ -220,9 +220,9 @@ window.onload = function() {
 			</p>
 		</form>
 		</div>
-	
+
 	</div>
-	
+
 	<div id="sidebar" >
 		<?php include('template/sidebar-theme.php'); ?>
 	</div>
